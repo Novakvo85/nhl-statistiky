@@ -1,0 +1,212 @@
+body {
+    background-color: #f5f7fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.main-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    padding: 2rem;
+    margin-top: 2rem;
+    max-width: 1200px;
+}
+
+.season-select {
+    max-width: 300px;
+    margin: 0 auto 1.5rem auto;
+}
+.clickable-row {
+    cursor: pointer;
+}
+
+.team-name {
+    font-weight: 500;
+    color: #0d6efd;
+    text-decoration: none;
+}
+.team-name:hover {
+    text-decoration: underline;
+}
+
+.table thead th a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.table thead th a:hover {
+    color: #0d6efd;
+}
+.table thead th.active-sort a {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.pagination .page-link {
+    border-radius: 8px !important;
+    margin: 0 2px;
+}
+
+.error-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    padding: 3rem 2rem;
+    margin-top: 4rem;
+    max-width: 600px;
+}
+.error-icon {
+    font-size: 4rem;
+}
+.error-code {
+    font-size: 5rem;
+    font-weight: bold;
+    color: #dee2e6;
+}
+
+.team-card {
+    width: 160px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 12px;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+    transition: transform 0.15s, box-shadow 0.15s;
+    background: #fff;
+    cursor: pointer;
+    text-decoration: none;
+}
+.team-card:hover {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+}
+.team-name-card {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #222;
+    text-align: center;
+    margin-top: 1rem;
+}
+.team-icon {
+    font-size: 2.6rem;
+    color: #0d6efd;
+}
+.teams-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.player-avatar {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: #adb5bd;
+    margin-bottom: 1rem;
+}
+.player-name {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.player-id {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.score-badge {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: .3em .8em;
+    background: #e9ecef;
+    border-radius: 8px;
+}
+
+.team-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+.team-score-badge {
+    font-size: 3rem;
+    font-weight: 800;
+    background: #e9ecef;
+    border-radius: 12px;
+    padding: 0.2rem 1.5rem;
+}
+.team-score-divider {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #adb5bd;
+}
+
+.favorite-btns form {
+    display: inline;
+}
+
+.search-form {
+    max-width: 400px;
+    margin: 0 auto 2rem auto;
+}
+.search-form input[type="text"] {
+    border-radius: 8px 0 0 8px;
+}
+.search-form button {
+    border-radius: 0 8px 8px 0;
+}
+
+.welcome-icon {
+    font-size: 3rem;
+    color: #0d6efd;
+}
+.login-icon {
+    font-size: 2.5rem;
+    color: #0d6efd;
+    display: block;
+    margin: 0 auto 1rem auto;
+}
+.register-icon {
+    font-size: 2.5rem;
+    color: #0d6efd;
+    display: block;
+    margin: 0 auto 1rem auto;
+}
+
+.site-footer {
+    background: #fff;
+    border-top: 1px solid #e9ecef;
+    padding: 1.5rem 0;
+    color: #555;
+}
+.footer-link {
+    color: #0d6efd;
+    text-decoration: none;
+}
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .main-card {
+        font-size: 0.85rem;
+    }
+}
+@media (max-width: 700px) {
+    .team-card { width: 100%; height: auto; margin: 10px 0; }
+    .teams-grid { flex-direction: column; align-items: center; }
+}

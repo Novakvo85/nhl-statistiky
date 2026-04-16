@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('Oblíbené týmy')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+        <h1 class="mb-4 text-center"><i class="bi bi-star-fill text-warning"></i> Oblíbené týmy – nadcházející zápasy</h1>
+
+        <div th:if="${upcomingGames.isEmpty()}" class="alert alert-info text-center mb-0">
+            <i class="bi bi-info-circle"></i> Žádný z tvých oblíbených týmů zatím nemá naplánovaný zápas.
+        </div>
+
+        <div class="table-responsive" th:if="${not upcomingGames.isEmpty()}">
+            <table class="table table-striped align-middle mb-0 shadow-sm">
+                <thead class="table-primary">
+                <tr>
+                    <th>Domácí</th>
+                    <th>Hosté</th>
+                    <th class="text-center">Datum</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="game : ${upcomingGames}" class="clickable-row"
+                    th:data-href="@{/games/{id}(id=${game.id})}"
+                    onclick="window.location.href = this.dataset.href">
+                    <td th:text="${game.homeTeam.name}"></td>
+                    <td th:text="${game.visitingTeam.name}"></td>
+                    <td class="text-center" th:text="${#temporals.format(game.startTimeUtc, 'dd.MM.yyyy HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

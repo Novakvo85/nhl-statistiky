@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${team.name} + ' | NHL Statistiky'">Detail týmu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+
+<div class="container">
+    <div class="main-card mx-auto">
+        <h1 class="mb-3 text-center" th:text="${team.name}">Název týmu</h1>
+
+        <div sec:authorize="isAuthenticated()" class="favorite-btns text-center mb-4">
+            <form th:if="${not isFavorite}" th:action="@{/teams/{id}/addFavorite(id=${team.id})}" method="post">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-star"></i> Přidat do oblíbených
+                </button>
+            </form>
+            <form th:if="${isFavorite}" th:action="@{/teams/{id}/dropFavorite(id=${team.id})}" method="post">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-star-fill"></i> Odebrat z oblíbených
+                </button>
+            </form>
+        </div>
+
+        <form method="get" class="season-select mb-4">
+            <label for="season" class="form-label"><i class="bi bi-calendar2-week"></i> Vyberte sezónu</label>
+            <select id="season" name="season" class="form-select" onchange="this.form.submit()">
+                <option th:each="season : ${seasons}"
+                        th:value="${season.id}"
+                        th:text="${season.startYear}+ ' - ' + ${season.endYear}"
+                        th:selected="${season.id == selectedSeasonId}">
+                </option>
+            </select>
+        </form>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-striped align-middle mb-0 shadow-sm text-center w-auto mx-auto">
+                <thead class="table-primary">
+                <tr>
+                    <th title="Zápasy odehrané">Z</th>
+                    <th title="Výhry">V</th>
+                    <th title="Prohry">P</th>
+                    <th title="Prohry v prodloužení">PP</th>
+                    <th title="Body"><strong>Body</strong></th>
+                    <th title="Procento bodů">%</th>
+                    <th title="Vstřelené góly">VG</th>
+                    <th title="Obdržené góly">OG</th>
+                    <th title="Rozdíl gólů">+/-</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${teamStats.matches}"></td>
+                    <td th:text="${teamStats.wins}"></td>
+                    <td th:text="${teamStats.losses}"></td>
+                    <td th:text="${teamStats.overtimeLosses}"></td>
+                    <td><strong th:text="${teamStats.points}"></strong></td>
+                    <td th:text="${#numbers.formatDecimal(teamStats.pointPctg, 1, 3)}"></td>
+                    <td th:text="${teamStats.goalsFor}"></td>
+                    <td th:text="${teamStats.goalsAgainst}"></td>
+                    <td th:text="${teamStats.goalsFor - teamStats.goalsAgainst}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-3 text-center"><i class="bi bi-people-fill"></i> Soupiska</h4>
+
+                <div th:if="${not #lists.isEmpty(goalies)}" class="mb-4">
+                    <h5 class="text-center text-primary">
+                        <i class="bi bi-shield-fill"></i> Brankáři
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                            <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Jméno</th>
+                                <th>Datum narození</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${goalies}" class="clickable-row"
+                                th:data-href="@{/players/{id}(id=${r.player.id})}"
+                                onclick="window.location.href = this.dataset.href">
+                                <td th:text="${r.sweaterNumber}"></td>
+                                <td th:text="${r.player.firstName + ' ' + r.player.lastName}"></td>
+                                <td th:text="${#temporals.format(r.player.birthDate, 'dd.MM.yyyy')}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div th:if="${not #lists.isEmpty(defencemen)}" class="mb-4">
+                    <h5 class="text-center text-success">
+                        <i class="bi bi-shield-shaded"></i> Obránci
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                            <thead class="table-success">
+                            <tr>
+                                <th>#</th>
+                                <th>Jméno</th>
+                                <th>Datum narození</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${defencemen}" class="clickable-row"
+                                th:data-href="@{/players/{id}(id=${r.player.id})}"
+                                onclick="window.location.href = this.dataset.href">
+                                <td th:text="${r.sweaterNumber}"></td>
+                                <td th:text="${r.player.firstName + ' ' + r.player.lastName}"></td>
+                                <td th:text="${#temporals.format(r.player.birthDate, 'dd.MM.yyyy')}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div th:if="${not #lists.isEmpty(forwards)}" class="mb-4">
+                    <h5 class="text-center text-danger">
+                        <i class="bi bi-bullseye"></i> Útočníci
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                            <thead class="table-danger">
+                            <tr>
+                                <th>#</th>
+                                <th>Jméno</th>
+                                <th>Datum narození</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${forwards}" class="clickable-row"
+                                th:data-href="@{/players/{id}(id=${r.player.id})}"
+                                onclick="window.location.href = this.dataset.href">
+                                <td th:text="${r.sweaterNumber}"></td>
+                                <td th:text="${r.player.firstName + ' ' + r.player.lastName}"></td>
+                                <td th:text="${#temporals.format(r.player.birthDate, 'dd.MM.yyyy')}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="mb-3 text-center"><i class="bi bi-calendar3"></i> Zápasy</h4>
+
+                <div class="table-responsive mb-4" th:if="${not #lists.isEmpty(playoffGames)}">
+                    <h5 class="mb-3 text-center text-warning">
+                        <i class="bi bi-trophy-fill"></i> Playoff
+                    </h5>
+                    <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Domácí</th>
+                            <th>Skóre</th>
+                            <th>Hosté</th>
+                            <th>Datum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="game : ${playoffGames}" class="clickable-row" th:data-href="@{/games/{id}(id=${game.id})}" onclick="window.location.href = this.dataset.href">
+                            <td th:text="${game.homeTeam.name}"></td>
+                            <td>
+                                <span th:text="${game.homeScore}"></span>
+                                :
+                                <span th:text="${game.visitingScore}"></span>
+                            </td>
+                            <td th:text="${game.visitingTeam.name}"></td>
+                            <td th:text="${#temporals.format(game.startTimeUtc, 'dd.MM.yyyy HH:mm')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive mb-4" th:if="${not #lists.isEmpty(upcomingGames)}">
+                    <h5 class="mb-3 text-center text-info">
+                        <i class="bi bi-calendar-event"></i> Nadcházející zápasy
+                    </h5>
+                    <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Domácí</th>
+                            <th>Hosté</th>
+                            <th>Datum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="game : ${upcomingGames}" class="clickable-row" th:data-href="@{/games/{id}(id=${game.id})}" onclick="window.location.href = this.dataset.href">
+                            <td th:text="${game.homeTeam.name}"></td>
+                            <td th:text="${game.visitingTeam.name}"></td>
+                            <td th:text="${#temporals.format(game.startTimeUtc, 'dd.MM.yyyy HH:mm')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-responsive mb-4" th:if="${not #lists.isEmpty(finishedGames)}">
+                    <h5 class="mb-3 text-center text-warning">
+                        <i class="bi bi-check-circle-fill"></i> Odehrané zápasy
+                    </h5>
+                    <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Domácí</th>
+                            <th>Skóre</th>
+                            <th>Hosté</th>
+                            <th>Datum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="game : ${finishedGames}" class="clickable-row" th:data-href="@{/games/{id}(id=${game.id})}" onclick="window.location.href = this.dataset.href">
+                            <td th:text="${game.homeTeam.name}"></td>
+                            <td>
+                                <span th:text="${game.homeScore}"></span>
+                                :
+                                <span th:text="${game.visitingScore}"></span>
+                            </td>
+                            <td th:text="${game.visitingTeam.name}"></td>
+                            <td th:text="${#temporals.format(game.startTimeUtc, 'dd.MM.yyyy HH:mm')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('Týmy')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+        <h1 class="mb-3 text-center"><i class="bi bi-shield-fill"></i> Týmy</h1>
+
+        <form method="get" class="season-select mb-4">
+            <label for="season" class="form-label"><i class="bi bi-calendar2-week"></i> Vyberte sezónu</label>
+            <select id="season" name="season" class="form-select" onchange="this.form.submit()">
+                <option th:each="season : ${seasons}"
+                        th:value="${season.id}"
+                        th:text="${season.startYear} + ' - ' + ${season.endYear}"
+                        th:selected="${season.id == selectedSeasonId}">
+                </option>
+            </select>
+        </form>
+
+        <div class="teams-grid">
+            <a th:each="team : ${teams}"
+               th:href="@{/teams/{id}(id=${team.id}, season=${selectedSeasonId})}"
+               class="team-card text-decoration-none">
+                <i class="bi bi-shield team-icon"></i>
+                <span class="team-name-card" th:text="${team.name}"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

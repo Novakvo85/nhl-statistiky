@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head>
+    <title th:text="${player.firstName} + ' ' + ${player.lastName} + ' | NHL Statistiky'">Detail hráče</title>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+
+        <div class="text-center mb-4">
+            <div class="player-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="player-name mb-2" th:text="${player.firstName} + ' ' + ${player.lastName}">Jméno hráče</div>
+            <div class="mb-2">
+                <span th:if="${player.active}" class="badge bg-success">
+                    <i class="bi bi-check-circle"></i> Aktivní
+                </span>
+                <span th:unless="${player.active}" class="badge bg-secondary">
+                    <i class="bi bi-x-circle"></i> Neaktivní
+                </span>
+            </div>
+            <div class="player-id">ID: <span th:text="${player.id}"></span></div>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <table class="table table-striped align-middle mb-0">
+                    <tbody>
+                    <tr>
+                        <td><strong>Číslo dresu</strong></td>
+                        <td th:text="${player.sweaterNumber != null ? '#' + player.sweaterNumber : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pozice</strong></td>
+                        <td th:text="${player.position != null ? player.position : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aktuální Tým</strong></td>
+                        <td>
+                            <a th:if="${player.currentTeam != null}"
+                               th:href="@{/teams/{id}(id=${player.currentTeam.id})}"
+                               th:text="${player.currentTeam.name}"
+                               class="text-decoration-none"></a>
+                            <span th:unless="${player.currentTeam != null}">N/A</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Národnost</strong></td>
+                        <td th:text="${player.birthCountry != null ? player.birthCountry : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Datum narození</strong></td>
+                        <td th:text="${player.birthDate != null ? #temporals.format(player.birthDate, 'dd.MM.yyyy') : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Město narození</strong></td>
+                        <td th:text="${player.birthCity != null ? player.birthCity : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Výška</strong></td>
+                        <td th:text="${player.heightInCentimetres != null ? player.heightInCentimetres + ' cm' : 'N/A'}"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Váha</strong></td>
+                        <td th:text="${player.weightInKilograms != null ? player.weightInKilograms + ' kg' : 'N/A'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div th:if="${player.position == 'G'}">
+            <h4 class="mb-3 text-center"><i class="bi bi-shield-fill"></i> Statistiky po sezónách</h4>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0 shadow-sm">
+                    <thead class="table-primary">
+                    <tr>
+                        <th>Sezóna</th>
+                        <th>Tým</th>
+                        <th class="text-center">Zápasy</th>
+                        <th class="text-center" title="Střely proti">SP</th>
+                        <th class="text-center" title="Obdržené góly">OG</th>
+                        <th class="text-center" title="Úspěšnost zákroků">ÚZ%</th>
+                        <th class="text-center" title="Průměr obdržených gólů na zápas">POG</th>
+                        <th class="text-center" title="Doba na ledě">DNL</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${seasonStats}">
+                        <td th:text="${s.roster.teamSeason.season.getStartYear() + '/' + s.roster.teamSeason.season.endYear}"></td>
+                        <td>
+                            <a class="text-decoration-none" th:text="${s.roster.teamSeason.team.getName()}"
+                               th:href="@{/teams/{id}(id=${s.roster.teamSeason.team.id}, season=${s.roster.teamSeason.season.id})}"></a>
+                        </td>
+                        <td class="text-center" th:text="${s.gamesPlayed}"></td>
+                        <td class="text-center" th:text="${s.shotsAgainst}"></td>
+                        <td class="text-center" th:text="${s.goalsAgainst}"></td>
+                        <td class="text-center" th:text="${#numbers.formatDecimal(s.savePctg * 100, 1, 1) + '%'}"></td>
+                        <td class="text-center" th:text="${#numbers.formatDecimal(s.gaa, 1, 2)}"></td>
+                        <td class="text-center" th:text="${s.toi}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div th:unless="${player.position == 'G'}">
+            <h4 class="mb-3 text-center"><i class="bi bi-graph-up"></i> Statistiky po sezónách</h4>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0 shadow-sm">
+                    <thead class="table-primary">
+                    <tr>
+                        <th>Sezóna</th>
+                        <th>Tým</th>
+                        <th class="text-center">Zápasy</th>
+                        <th class="text-center">Góly</th>
+                        <th class="text-center">Asistence</th>
+                        <th class="text-center">Body</th>
+                        <th class="text-center">+/-</th>
+                        <th class="text-center">Trestné min.</th>
+                        <th class="text-center">Střely</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${seasonStats}">
+                        <td th:text="${s.roster.teamSeason.season.getStartYear() + '/' + s.roster.teamSeason.season.endYear}"></td>
+                        <td>
+                            <a class="text-decoration-none" th:text="${s.roster.teamSeason.team.getName()}"
+                               th:href="@{/teams/{id}(id=${s.roster.teamSeason.team.id}, season=${s.roster.teamSeason.season.id})}"></a>
+                        </td>
+                        <td class="text-center" th:text="${s.gamesPlayed}"></td>
+                        <td class="text-center" th:text="${s.goals}"></td>
+                        <td class="text-center" th:text="${s.assists}"></td>
+                        <td class="text-center" th:text="${s.points}"></td>
+                        <td class="text-center" th:text="${s.plusMinus}"></td>
+                        <td class="text-center" th:text="${s.pim}"></td>
+                        <td class="text-center" th:text="${s.shots}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="text-muted small mt-2">
+            <i class="bi bi-info-circle"></i> Některé statistiky nemusí být ve starších sezónách zaznamenány.
+        </p>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

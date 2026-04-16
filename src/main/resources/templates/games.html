@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('Seznam zápasů')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+        <h1 class="mb-4 text-center"><i class="bi bi-calendar3"></i> Zápasy</h1>
+
+        <form th:action="@{/games}" method="get" class="d-flex gap-2 align-items-center mb-4 flex-wrap">
+            <a th:href="@{/games(date=${previousDate})}" class="btn btn-outline-secondary">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <label for="date" class="form-label mb-0"><i class="bi bi-calendar2"></i> Vyber den:</label>
+            <input type="date" id="date" name="date" class="form-control" style="max-width: 180px;" th:value="${selectedDate}">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Zobrazit</button>
+            <a th:href="@{/games(date=${nextDate})}" class="btn btn-outline-secondary">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            <a th:href="@{/games}" class="btn btn-outline-success">
+                <i class="bi bi-calendar-check"></i> Dnes
+            </a>
+        </form>
+
+        <div th:if="${games.isEmpty()}" class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> V tento den nejsou žádné zápasy.
+        </div>
+
+        <div class="table-responsive" th:if="${not games.isEmpty()}">
+            <table class="table table-striped table-hover align-middle mb-0 shadow-sm">
+                <thead class="table-primary">
+                <tr>
+                    <th style="width: 120px;">Čas</th>
+                    <th>Hosté</th>
+                    <th class="text-center" style="width: 120px;">Skóre</th>
+                    <th>Domácí</th>
+                    <th class="d-none d-md-table-cell text-center" style="width: 70px;"></th>
+                    <th class="d-none d-md-table-cell text-center" style="width: 90px;">Stav</th>
+                    <th class="d-none d-md-table-cell text-center" style="width: 70px;">Typ</th>
+                    <th class="d-none d-md-table-cell text-center">Stadion</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="game : ${games}" class="clickable-row"
+                    th:data-href="@{/games/{id}(id=${game.id})}"
+                    onclick="window.location.href = this.dataset.href">
+                    <td th:text="${#temporals.format(game.startTimeUtc, 'HH:mm dd.MM.')}"></td>
+                    <td class="fw-semibold" th:text="${game.visitingTeam.name}"></td>
+                    <td class="text-center">
+                        <span th:if="${game.gameState == 'OFF' or game.gameState == 'LIVE'}">
+                            <span class="score-badge" th:text="${game.visitingScore}"></span>
+                            <span class="mx-1">:</span>
+                            <span class="score-badge" th:text="${game.homeScore}"></span>
+                        </span>
+                    </td>
+                    <td class="fw-semibold" th:text="${game.homeTeam.name}"></td>
+                    <td class="d-none d-md-table-cell text-center">
+                        <span th:if="${game.gameOutcome != null}" th:text="${game.gameOutcome}" class="badge bg-secondary"></span>
+                    </td>
+                    <td class="d-none d-md-table-cell text-center">
+                        <span th:switch="${game.gameState}">
+                            <span th:case="'OFF'"  class="badge bg-success">Konec</span>
+                            <span th:case="*"      class="badge bg-secondary" th:text="${game.gameState}"></span>
+                        </span>
+                    </td>
+                    <td class="d-none d-md-table-cell text-center">
+                        <span th:switch="${game.gameType}">
+                            <span th:case="2"  class="badge bg-success">Základní část</span>
+                            <span th:case="3"  class="badge bg-danger">Playoff</span>
+                            <span th:case="*"      class="badge bg-secondary" th:text="${game.gameType}"></span>
+                        </span>
+                    </td>
+                    <td class="d-none d-md-table-cell text-muted small" th:text="${game.venueName}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

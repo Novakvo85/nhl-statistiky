@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('Detail zápasu')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+
+        <div class="d-flex justify-content-center align-items-center mb-3 flex-wrap gap-2">
+            <span class="team-title">
+                <a class="text-decoration-none text-dark" th:text="${game.homeTeam.name}" th:href="@{/teams/{id}(id=${game.homeTeam.id}, season=${game.getSeason().id})}"></a>
+            </span>
+            <span class="team-score-badge" th:text="${game.homeScore}"></span>
+            <span class="team-score-divider">:</span>
+            <span class="team-score-badge" th:text="${game.visitingScore}"></span>
+            <span class="team-title">
+                <a class="text-decoration-none text-dark" th:text="${game.visitingTeam.name}" th:href="@{/teams/{id}(id=${game.visitingTeam.id}, season=${game.getSeason().id})}"></a>
+            </span>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center gap-3 mb-4 flex-wrap text-muted small">
+            <span><i class="bi bi-calendar3"></i> <span th:text="${#temporals.format(game.startTimeUtc, 'dd.MM.yyyy HH:mm')}"></span></span>
+            <span th:if="${game.venueName}"><i class="bi bi-geo-alt"></i> <span th:text="${game.venueName}"></span></span>
+            <span th:switch="${game.gameState}">
+                <span th:case="'LIVE'" class="badge bg-danger">LIVE</span>
+                <span th:case="'OFF'"  class="badge bg-success">Konec</span>
+                <span th:case="*"      class="badge bg-secondary" th:text="${game.gameState}"></span>
+            </span>
+            <span th:if="${game.gameOutcome != null}" class="badge bg-secondary" th:text="${game.gameOutcome}"></span>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(homeGoalies) or not #lists.isEmpty(homeDefencemen) or not #lists.isEmpty(homeForwards)}" class="mb-4">
+            <h4 class="mb-3 text-center">
+                <i class="bi bi-house-door-fill"></i>
+                <a class="text-decoration-none text-dark" th:text="${game.homeTeam.name}"
+                   th:href="@{/teams/{id}(id=${game.homeTeam.id}, season=${game.getSeason().id})}"></a>
+            </h4>
+
+            <div th:if="${not #lists.isEmpty(homeForwards)}" class="mb-4">
+                <h5 class="text-center text-danger"><i class="bi bi-bullseye"></i> Útočníci</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-danger">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Body">B</th>
+                            <th class="text-center" title="Plus / Mínus">+/-</th>
+                            <th class="text-center" title="Přesilovkové góly">PG</th>
+                            <th class="text-center" title="Úspěšnost vhazování">ÚV%</th>
+                            <th class="text-center" title="Blokované střely">BS</th>
+                            <th class="text-center" title="Počet hitů">PH</th>
+                            <th class="text-center" title="Střely na branku">S</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${homeForwards}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.points}"></td>
+                            <td class="text-center" th:text="${stats.plusMinus}"></td>
+                            <td class="text-center" th:text="${stats.powerPlayGoals}"></td>
+                            <td class="text-center" th:text="${#numbers.formatDecimal(stats.faceoffWinningPctg, 1, 2)}"></td>
+                            <td class="text-center" th:text="${stats.blockedShots}"></td>
+                            <td class="text-center" th:text="${stats.hits}"></td>
+                            <td class="text-center" th:text="${stats.shots}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(homeDefencemen)}" class="mb-4">
+                <h5 class="text-center text-success"><i class="bi bi-shield-shaded"></i> Obránci</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-success">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Body">B</th>
+                            <th class="text-center" title="Plus / Mínus">+/-</th>
+                            <th class="text-center" title="Přesilovkové góly">PG</th>
+                            <th class="text-center" title="Úspěšnost vhazování">ÚV%</th>
+                            <th class="text-center" title="Blokované střely">BS</th>
+                            <th class="text-center" title="Počet hitů">PH</th>
+                            <th class="text-center" title="Střely na branku">S</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${homeDefencemen}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.points}"></td>
+                            <td class="text-center" th:text="${stats.plusMinus}"></td>
+                            <td class="text-center" th:text="${stats.powerPlayGoals}"></td>
+                            <td class="text-center" th:text="${#numbers.formatDecimal(stats.faceoffWinningPctg, 1, 2)}"></td>
+                            <td class="text-center" th:text="${stats.blockedShots}"></td>
+                            <td class="text-center" th:text="${stats.hits}"></td>
+                            <td class="text-center" th:text="${stats.shots}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(homeGoalies)}" class="mb-4">
+                <h5 class="text-center text-primary"><i class="bi bi-shield-fill"></i> Brankáři</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Střely proti">SP</th>
+                            <th class="text-center" title="Obdržené góly">OG</th>
+                            <th class="text-center" title="Úspěšnost zákroků">ÚZ%</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${homeGoalies}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.shotsAgainst}"></td>
+                            <td class="text-center" th:text="${stats.goalsAgainst}"></td>
+                            <td class="text-center" th:text="${stats.savePctg}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(visitingGoalies) or not #lists.isEmpty(visitingDefencemen) or not #lists.isEmpty(visitingForwards)}" class="mb-4">
+            <h4 class="mb-3 text-center">
+                <i class="bi bi-airplane-fill"></i>
+                <a class="text-decoration-none text-dark" th:text="${game.visitingTeam.name}"
+                   th:href="@{/teams/{id}(id=${game.visitingTeam.id}, season=${game.getSeason().id})}"></a>
+            </h4>
+
+            <div th:if="${not #lists.isEmpty(visitingForwards)}" class="mb-4">
+                <h5 class="text-center text-danger"><i class="bi bi-bullseye"></i> Útočníci</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-danger">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Body">B</th>
+                            <th class="text-center" title="Plus / Mínus">+/-</th>
+                            <th class="text-center" title="Přesilovkové góly">PG</th>
+                            <th class="text-center" title="Úspěšnost vhazování">ÚV%</th>
+                            <th class="text-center" title="Blokované střely">BS</th>
+                            <th class="text-center" title="Počet hitů">PH</th>
+                            <th class="text-center" title="Střely na branku">S</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${visitingForwards}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.points}"></td>
+                            <td class="text-center" th:text="${stats.plusMinus}"></td>
+                            <td class="text-center" th:text="${stats.powerPlayGoals}"></td>
+                            <td class="text-center" th:text="${#numbers.formatDecimal(stats.faceoffWinningPctg, 1, 2)}"></td>
+                            <td class="text-center" th:text="${stats.blockedShots}"></td>
+                            <td class="text-center" th:text="${stats.hits}"></td>
+                            <td class="text-center" th:text="${stats.shots}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(visitingDefencemen)}" class="mb-4">
+                <h5 class="text-center text-success"><i class="bi bi-shield-shaded"></i> Obránci</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-success">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Body">B</th>
+                            <th class="text-center" title="Plus / Mínus">+/-</th>
+                            <th class="text-center" title="Přesilovkové góly">PG</th>
+                            <th class="text-center" title="Úspěšnost vhazování">ÚV%</th>
+                            <th class="text-center" title="Blokované střely">BS</th>
+                            <th class="text-center" title="Počet hitů">PH</th>
+                            <th class="text-center" title="Střely na branku">S</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${visitingDefencemen}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.points}"></td>
+                            <td class="text-center" th:text="${stats.plusMinus}"></td>
+                            <td class="text-center" th:text="${stats.powerPlayGoals}"></td>
+                            <td class="text-center" th:text="${#numbers.formatDecimal(stats.faceoffWinningPctg, 1, 2)}"></td>
+                            <td class="text-center" th:text="${stats.blockedShots}"></td>
+                            <td class="text-center" th:text="${stats.hits}"></td>
+                            <td class="text-center" th:text="${stats.shots}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(visitingGoalies)}" class="mb-4">
+                <h5 class="text-center text-primary"><i class="bi bi-shield-fill"></i> Brankáři</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0 shadow-sm">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Hráč</th>
+                            <th class="text-center" title="Góly">G</th>
+                            <th class="text-center" title="Asistence">A</th>
+                            <th class="text-center" title="Střely proti">SP</th>
+                            <th class="text-center" title="Obdržené góly">OG</th>
+                            <th class="text-center" title="Úspěšnost zákroků">ÚZ%</th>
+                            <th class="text-center" title="Počet trestných minut">PTM</th>
+                            <th class="text-center" title="Doba na ledě">DNL</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="stats : ${visitingGoalies}">
+                            <td><a class="text-decoration-none"
+                                   th:text="${stats.player.firstName} + ' ' + ${stats.player.lastName}"
+                                   th:href="@{/players/{id}(id=${stats.player.id})}"></a></td>
+                            <td class="text-center" th:text="${stats.goals}"></td>
+                            <td class="text-center" th:text="${stats.assists}"></td>
+                            <td class="text-center" th:text="${stats.shotsAgainst}"></td>
+                            <td class="text-center" th:text="${stats.goalsAgainst}"></td>
+                            <td class="text-center" th:text="${stats.savePctg}"></td>
+                            <td class="text-center" th:text="${stats.pim}"></td>
+                            <td class="text-center" th:text="${stats.toi}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted small mt-2">
+            <i class="bi bi-info-circle"></i> Některé statistiky nemusí být ve starších sezónách zaznamenány.
+        </p>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

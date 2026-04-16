@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card text-center mx-auto">
+        <div class="mb-3">
+            <i class="bi bi-hockey-puck welcome-icon"></i>
+        </div>
+        <h1 class="mb-3">Vítejte na NHL Statistiky!</h1>
+        <p class="lead mb-4">
+            Sledujte aktuální statistiky, zápasy, týmy a hráče z nejprestižnější hokejové ligy světa.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/games" class="btn btn-outline-primary btn-lg"><i class="bi bi-calendar2-week"></i> Zápasy</a>
+            <a href="/teams" class="btn btn-outline-success btn-lg"><i class="bi bi-people"></i> Týmy</a>
+            <a href="/players" class="btn btn-outline-secondary btn-lg"><i class="bi bi-person-vcard"></i> Hráči</a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

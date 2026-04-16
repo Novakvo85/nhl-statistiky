@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="cs">
+<head th:replace="~{fragments/layout :: head('Vyhledávání hráčů')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="main-card mx-auto">
+        <h1 class="mb-4 text-center"><i class="bi bi-search"></i> Vyhledávání hráčů</h1>
+
+        <form th:action="@{/players}" method="get" class="search-form d-flex">
+            <input type="text" name="q" th:value="${query}" class="form-control" placeholder="Hledat hráče..." />
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Hledat</button>
+        </form>
+
+        <div th:if="${#lists.isEmpty(players)}" class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> Žádný hráč neodpovídá hledání.
+        </div>
+
+        <div class="list-group" th:if="${not #lists.isEmpty(players)}">
+            <a th:each="player : ${players}"
+               th:href="@{/players/{id}(id=${player.id})}"
+               class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-3 text-decoration-none">
+                <i class="bi bi-person-fill fs-5 text-primary"></i>
+                <span class="fs-5 fw-medium" th:text="${player.firstName} + ' ' + ${player.lastName}"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
